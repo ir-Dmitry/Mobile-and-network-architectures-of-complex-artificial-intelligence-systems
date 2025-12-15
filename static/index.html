@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Курсы валют (ЦБ РФ)</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h2>Курсы валют ЦБ РФ</h2>
+
+    <div class="form-group">
+        <label>Дата: <input type="date" id="dateInput" value=""></label>
+        <button onclick="getRates()">Получить курсы</button>
+    </div>
+
+    <div class="form-group">
+        <button onclick="setPeriod(-7)">Неделю назад</button>
+        <button onclick="setPeriod(-30)">Месяц назад</button>
+        <button onclick="setPeriod(-90)">Квартал назад</button>
+        <button onclick="setPeriod(-180)">Полгода назад</button>
+    </div>
+
+    <div id="loading" style="display:none;">Загрузка...</div>
+    <div id="error" class="error"></div>
+    <div id="result" class="result"></div>
+
+    <hr>
+    <h3>История запросов</h3>
+    <button onclick="loadHistory()">Обновить историю</button>
+    <div id="history"></div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
