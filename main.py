@@ -9,9 +9,11 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 @app.get("/")
 async def root():
     return FileResponse("static/index.html")
+
 
 @app.get("/api/rates")
 async def api_rates(date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$")):
@@ -19,6 +21,7 @@ async def api_rates(date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$")):
     if rates is None:
         return {"error": "Не удалось получить данные от ЦБ РФ"}
     return {"date": date, "rates": rates}
+
 
 @app.get("/api/history")
 async def api_history(limit: Optional[int] = 50):

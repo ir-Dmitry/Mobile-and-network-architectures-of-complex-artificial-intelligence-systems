@@ -1,34 +1,228 @@
+/* Обнуление */
+* {
+    box-sizing: border-box;
+}
+
 body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 16px;
+    color: #333;
+}
+
+/* Обёртка для центрирования на ПК */
+.container {
     max-width: 800px;
-    margin: 20px auto;
-    padding: 0 10px;
+    margin: 0 auto;
 }
 
+/* Заголовки */
+h2, h3 {
+    text-align: center;
+    margin: 16px 0;
+}
+
+/* Форма */
 .form-group {
-    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+    justify-content: center;
+    align-items: center;
 }
 
-input, button {
-    padding: 6px 10px;
+input[type="date"],
+button {
+    padding: 10px 16px;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    min-width: 140px;
+    text-align: center;
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.result {
-    margin-top: 20px;
+button:hover {
+    background-color: #f0f0f0;
+}
+
+button:focus,
+input:focus {
+    outline: 2px solid #007bff;
+}
+
+/* Сообщения */
+#loading, #error, #result, #history {
+    margin: 16px 0;
 }
 
 .error {
-    color: red;
+    color: #d32f2f;
+    text-align: center;
 }
 
+.result h3 {
+    margin: 24px 0 12px;
+}
+
+/* Таблица — общий стиль */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin: 16px 0;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 th, td {
-    border: 1px solid #ccc;
-    padding: 6px;
+    padding: 12px;
     text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+/* ===== ДЕСКТОПНЫЙ СТИЛЬ (по умолчанию) ===== */
+@media (min-width: 768px) {
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        padding: 32px;
+    }
+
+    h2 {
+        font-size: 2.2rem;
+        color: #1a237e;
+    }
+
+    .form-group {
+        gap: 20px;
+        justify-content: center;
+    }
+
+    input[type="date"],
+    button {
+        font-size: 18px;
+        border-radius: 12px;
+        border: 2px solid #d1d5db;
+        min-width: 180px;
+    }
+
+    table {
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    th {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    hr {
+        border: 0;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #3f51b5, transparent);
+        margin: 32px 0;
+    }
+}
+
+/* ===== МОБИЛЬНЫЙ СТИЛЬ (макс. 767px) ===== */
+@media (max-width: 767px) {
+    body {
+        background-color: #fff;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    h2 {
+        font-size: 1.6rem;
+        color: #2196f3;
+        margin: 12px 0;
+    }
+
+    .form-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    input[type="date"],
+    button {
+        width: 100%;
+        font-size: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid #bbdefb;
+        background-color: #e3f2fd;
+    }
+
+    button {
+        background-color: #2196f3;
+        color: white;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background-color: #1976d2;
+    }
+
+    table {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        border-radius: 12px;
+    }
+
+    th {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+    }
+
+    hr {
+        border: 0;
+        height: 1px;
+        background: #bdbdbd;
+        margin: 20px 0;
+    }
+
+    /* Мобильная версия таблицы — карточки */
+    @media (max-width: 576px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr { position: absolute; top: -9999px; left: -9999px; }
+
+        tr {
+            margin-bottom: 16px;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            background: #f9f9f9;
+        }
+
+        td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border: none;
+        }
+
+        td::before {
+            content: attr(data-label) ": ";
+            position: absolute;
+            left: 12px;
+            width: 45%;
+            font-weight: bold;
+            text-align: left;
+            color: #555;
+        }
+    }
 }
