@@ -58,7 +58,11 @@ async function tryGetRates(date) {
     try {
         const res = await fetch(`/api/rates?date=${date}`);
         const data = await res.json();
-        if (data.error) return null;
+        
+        if (data.rates === null) {
+            return null;  // сигнал: данных нет
+        }
+
         let html = `<h3>Курсы на ${data.date}:</h3><table>`;
         html += `<tr><th>Валюта</th><th>Курс</th></tr>`;
         for (const [code, rate] of Object.entries(data.rates)) {

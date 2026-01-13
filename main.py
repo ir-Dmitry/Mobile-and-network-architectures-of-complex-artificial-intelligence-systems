@@ -26,7 +26,7 @@ async def root():
 async def api_rates(date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$")):
     rates = get_rates_for_date(date)
     if rates is None:
-        return {"error": "Не удалось получить данные от ЦБ РФ"}
+        return {"date": date, "rates": None}
     return {"date": date, "rates": rates}
 
 
