@@ -63,7 +63,8 @@ async function fetchAndSaveRates(date) {
 async function tryGetRates(date) {
     console.log(`[tryGetRates] Запрашиваем данные из БД за дату: ${date}`);
     try {
-        const res = await fetch(`/api/rates?date=${date}`);
+        const url = `/api/rates?date=${date}`;
+        const res = await fetch(url);
         console.log(`[tryGetRates] URL запроса:`, url);
         console.log(`[tryGetRates] Ответ от API:`, res.status, res.statusText);
         
