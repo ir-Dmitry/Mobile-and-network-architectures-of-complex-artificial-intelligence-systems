@@ -22,12 +22,15 @@ async function getRates() {
     // Сначала пробуем показать то, что есть
     let rates = await tryGetRates(date);
     if (rates) {
+        console.log("[getRates] Данные найдены в БД, отображаем");
         showResult(rates);
         return;
     }
 
     // Если данных нет — обновляем
+    console.log("[getRates] Данные не найдены в БД, запрашиваем у ЦБ...");
     showError("Данные не найдены. Запрашиваем у ЦБ...");
+
     const ok = await fetchAndSaveRates(date);
     if (ok) {
         // Ждём немного и запрашиваем снова
@@ -36,9 +39,12 @@ async function getRates() {
             if (fresh) {
                 showResult(fresh);
             } else {
+                console.error("[getRates] Данные НЕ появились в БД даже после обновления");
                 showError("Данные обновлены, но не появились в БД");
             }
         }, 1000);
+    } else {
+        console.error("[getRates] Не удалось вызвать облачную функцию");
     }
 }
 
@@ -55,11 +61,22 @@ async function fetchAndSaveRates(date) {
 }
 
 async function tryGetRates(date) {
+    console.log(`[tryGetRates] Запрашиваем данные из БД за дату: ${date}`);
     try {
         const res = await fetch(`/api/rates?date=${date}`);
+        console.log(`[tryGetRates] URL запроса:`, url);
+        console.log(`[tryGetRates] Ответ от API:`, res.status, res.statusText);
+        
+        if (!res.ok) {
+            console.error(`[tryGetRates] HTTP ошибка: ${res.status}`);
+            throw new Error(`HTTP ${res.status}`);
+        }
+        
         const data = await res.json();
+        console.log(`[tryGetRates] Полученные данные:`, data);
         
         if (data.rates === null) {
+            console.log("[tryGetRates] Данных в БД нет (rates: null)");
             return null;  // сигнал: данных нет
         }
 
@@ -74,6 +91,7 @@ async function tryGetRates(date) {
         html += `</table>`;
         return html;
     } catch (e) {
+        console.error("[tryGetRates] ОШИБКА при запросе к API:", e);
         showError("Ошибка соединения с сервером");
         return null;
     }
