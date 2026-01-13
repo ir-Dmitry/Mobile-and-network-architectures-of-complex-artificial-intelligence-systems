@@ -19,41 +19,61 @@ async function getRates() {
         return;
     }
 
-    showLoading(true);
-    clearError();
+    // Сначала пробуем показать то, что есть
+    let rates = await tryGetRates(date);
+    if (rates) {
+        showResult(rates);
+        return;
+    }
 
-    try {
-        const res = await fetch(`/api/rates?date=${date}`);
-        const data = await res.json();
-
-        if (data.error) {
-            showError(data.error);
-            showResult("");
-        } else {
-            // let html = `<h3>Курсы на ${data.date}:</h3><table><tr><th>Валюта</th><th>Курс</th></tr>`;
-            // for (const [code, rate] of Object.entries(data.rates)) {
-            //     html += `<tr><td>${code}</td><td>${rate.toFixed(5)}</td></tr>`;
-            // }
-            // html += `</table>`;
-
-            let html = `<h3>Курсы на ${data.date}:</h3><table>`;
-            html += `<tr><th>Валюта</th><th>Курс</th></tr>`;
-            for (const [code, rate] of Object.entries(data.rates)) {
-                html += `<tr>
-                    <td data-label="Валюта">${code}</td>
-                    <td data-label="Курс">${rate.toFixed(5)}</td>
-                </tr>`;
+    // Если данных нет — обновляем
+    showError("Данные не найдены. Запрашиваем у ЦБ...");
+    const ok = await fetchAndSaveRates(date);
+    if (ok) {
+        // Ждём немного и запрашиваем снова
+        setTimeout(async () => {
+            const fresh = await tryGetRates(date);
+            if (fresh) {
+                showResult(fresh);
+            } else {
+                showError("Данные обновлены, но не появились в БД");
             }
-            html += `</table>`;
-            showResult(html);
-        }
-    } catch (e) {
-        showError("Ошибка соединения с сервером");
-    } finally {
-        showLoading(false);
+        }, 1000);
     }
 }
 
+async function fetchAndSaveRates(date) {
+    try {
+        const res = await fetch(`https://functions.yandexcloud.net/d4ee03meuoirktv7k4ol?date=${date}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Ошибка обновления");
+        return true;
+    } catch (e) {
+        showError("Не удалось обновить курсы: " + e.message);
+        return false;
+    }
+}
+
+async function tryGetRates(date) {
+    try {
+        const res = await fetch(`/api/rates?date=${date}`);
+        const data = await res.json();
+        if (data.error) return null;
+        let html = `<h3>Курсы на ${data.date}:</h3><table>`;
+        html += `<tr><th>Валюта</th><th>Курс</th></tr>`;
+        for (const [code, rate] of Object.entries(data.rates)) {
+            html += `<tr>
+                <td data-label="Валюта">${code}</td>
+                <td data-label="Курс">${rate.toFixed(5)}</td>
+            </tr>`;
+        }
+        html += `</table>`;
+        return html;
+    } catch (e) {
+        showError("Ошибка соединения с сервером");
+        return null;
+    }
+}
 async function loadHistory() {
     showLoading(true);
     try {
