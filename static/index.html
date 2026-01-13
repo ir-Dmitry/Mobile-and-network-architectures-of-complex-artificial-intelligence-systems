@@ -30,6 +30,15 @@
     <button onclick="loadHistory()">Обновить историю</button>
     <div id="history"></div>
 
+    <hr>
+    <h3>Аналитика валюты</h3>
+    <div class="form-group">
+        <label>Валюта: <input type="text" id="currencyInput" value="USD" maxlength="3"></label>
+        <label>Дней: <input type="number" id="daysInput" value="30" min="1" max="365"></label>
+        <button onclick="loadAnalytics()">Показать аналитику</button>
+    </div>
+    <div id="analytics"></div>
+
     <script src="/static/script.js"></script>
 </body>
 </html>

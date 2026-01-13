@@ -1,10 +1,11 @@
 # main.py
-from fastapi import FastAPI, Query, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from typing import Optional, Dict
-from pydantic import BaseModel
+import pandas as pd
 from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional, Dict
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Query, HTTPException
 from cbr_service import get_rates_for_date, get_history, save_to_db
 
 app = FastAPI(
@@ -62,3 +63,25 @@ async def ingest_from_function(payload: IngestPayload):
 
     save_to_db(payload.date, payload.rates)
     return {"status": "ok", "saved": len(payload.rates)}
+
+
+@app.get("/api/analytics")
+async def analytics(currency: str = "USD", days: int = 30):
+    history = get_history(days * 20)  # запас на выходные
+    # Фильтруем нужную валюту и последние N записей
+    filtered = [r for r in history if r["currency"] == currency][:days]
+    if not filtered:
+        return {"error": "Недостаточно данных"}
+
+    rates = [r["rate"] for r in filtered]
+    series = pd.Series(rates)
+
+    return {
+        "currency": currency,
+        "days": len(rates),
+        "mean": round(series.mean(), 6),
+        "std": round(series.std(), 6),
+        "min": series.min(),
+        "max": series.max(),
+        "trend": "up" if rates[-1] > rates[0] else "down",
+    }

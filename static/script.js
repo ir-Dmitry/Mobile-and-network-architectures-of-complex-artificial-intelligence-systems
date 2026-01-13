@@ -135,6 +135,44 @@ async function loadHistory() {
     }
 }
 
+async function loadAnalytics() {
+    const currency = document.getElementById('currencyInput').value.trim().toUpperCase();
+    const days = parseInt(document.getElementById('daysInput').value) || 30;
+
+    if (!currency || currency.length !== 3) {
+        showError("Укажите корректный код валюты (например, USD)");
+        return;
+    }
+
+    showLoading(true);
+    clearError();
+
+    try {
+        const res = await fetch(`/api/analytics?currency=${currency}&days=${days}`);
+        const data = await res.json();
+
+        if (data.error) {
+            showError(data.error);
+            document.getElementById('analytics').innerHTML = "";
+        } else {
+            let html = `<h4>Аналитика ${currency} за ${data.days} дней:</h4><table>`;
+            html += `<tr><th>Показатель</th><th>Значение</th></tr>`;
+            html += `<tr><td>Среднее</td><td>${data.mean.toFixed(6)}</td></tr>`;
+            html += `<tr><td>Минимум</td><td>${data.min.toFixed(6)}</td></tr>`;
+            html += `<tr><td>Максимум</td><td>${data.max.toFixed(6)}</td></tr>`;
+            html += `<tr><td>Волатильность (std)</td><td>${data.std.toFixed(6)}</td></tr>`;
+            html += `<tr><td>Тенденция</td><td>${data.trend === 'up' ? 'Рост' : 'Падение'}</td></tr>`;
+            html += `</table>`;
+            document.getElementById('analytics').innerHTML = html;
+        }
+    } catch (e) {
+        showError("Ошибка при загрузке аналитики");
+        document.getElementById('analytics').innerHTML = "";
+    } finally {
+        showLoading(false);
+    }
+}
+
 function showLoading(show) {
     document.getElementById('loading').style.display = show ? 'block' : 'none';
 }
